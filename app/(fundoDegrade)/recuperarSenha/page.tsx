@@ -60,7 +60,7 @@ export default function RecuperarSenha() {
               )}
             />
             <Button type="submit" className="w-full capitalize font-semibold">
-              entrar
+              enviar
             </Button>
           </form>
         </Form>

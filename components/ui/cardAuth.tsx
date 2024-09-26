@@ -27,7 +27,14 @@ export default function CardAuth({
   className?: string;
 }>) {
   return (
-    <Card className={`md:w-3/4 w-full text-start ${className}`}>
+    <Card
+      className={`md:w-3/4 w-full ${
+        title === "Email enviado!" ||
+        title === "Parabéns! Você finalizou o desafio!"
+          ? "text-center"
+          : "text-start"
+      } ${className}`}
+    >
       <CardHeader>
         <CardTitle className="font-semibold text-3xl text-primary">
           {title}

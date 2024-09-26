@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Image from "next/image";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,28 +25,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} flex flex-col gap-2 px-4 items-center py-16 justify-between antialiased bg-secondary bg-gradient-to-b from-primary to-secondary h-screen`}
-      >
-        <header>
-          <Image
-            src="https://pge-festival.s3.amazonaws.com/logotipo-pg-inova.png"
-            alt="PG Inova logo"
-            width={180}
-            height={100}
-            priority
-          />
-        </header>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
-        <footer>
-          <Image
-            src="https://pge-festival.s3.amazonaws.com/logo-pg-inova.png"
-            alt="PG Inova logo"
-            width={150}
-            height={100}
-            priority
-          />
-        </footer>
       </body>
     </html>
   );
