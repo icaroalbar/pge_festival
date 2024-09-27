@@ -15,8 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const LogOut = () => {
+    localStorage.removeItem("dataUser");
+    router.push("/");
+  };
   return (
     <div className="bg-gray-200 h-screen">
       <nav className="bg-primary shadow-md text-white font-semibold text-2xl flex justify-between items-center p-4">
@@ -36,20 +42,20 @@ export default function Home() {
             <DropdownMenuItem className="p-0">
               <Link
                 href={"/perfil"}
-                className="text-muted-foreground px-2 py-1 w-full rounded flex items-center gap-x-2 transition-colors justify-between hover:bg-primary/80 hover:text-white"
+                className="text-muted-foreground p-2 w-full rounded flex items-center gap-x-2 transition-colors justify-between hover:bg-primary/80 hover:text-white"
               >
                 Perfil
                 <Icon name="User" size={15} />
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="p-0">
-              <Link
-                href={"#"}
-                className="text-muted-foreground px-2 py-1 w-full rounded flex items-center gap-x-2 transition-colors justify-between hover:bg-primary/80 hover:text-white"
+              <Button
+                onClick={LogOut}
+                className="text-muted-foreground px-2 w-full bg-transparent rounded flex items-center gap-x-2 transition-colors justify-between hover:bg-primary/80 hover:text-white"
               >
                 Sair
                 <Icon name="LogOut" size={15} />
-              </Link>
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

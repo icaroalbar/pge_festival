@@ -15,31 +15,62 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import axios, { AxiosError } from "axios";
+import Icon from "@/components/ui/icons";
+import { useState } from "react"; // Import para o estado de erro
 
 const formSchema = z.object({
-  username: z.string().min(2, {
+  email: z.string().min(2, {
     message: "O campo de e-mail é obrigatório.",
   }),
-  password: z.string().min(2, {
+  senha: z.string().min(2, {
     message: "O campo de senha é obrigatório.",
   }),
 });
 
 export default function Login() {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Estado para armazenar o erro
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      email: "",
+      senha: "",
     },
   });
 
+  interface ErrorResponse {
+    error: string;
+  }
+
   const router = useRouter();
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    try {
+      setErrorMessage(null); // Reseta a mensagem de erro
+      const user = await axios.post(
+        "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/login",
+        data
+      );
+      if (user) {
+        localStorage.setItem("dataUser", JSON.stringify(true));
+        router.push("/home");
+      }
+    } catch (error: unknown) {
+      // Verifica se o erro é do tipo AxiosError
+      const axiosError = error as AxiosError<ErrorResponse>;
 
-    router.push("/home");
+      // Verifica se a resposta contém a propriedade 'error'
+      const errorMessage =
+        axiosError.response?.data?.error ??
+        "Erro ao realizar login. Tente novamente.";
+
+      // Captura o erro e atualiza o estado
+      setErrorMessage(errorMessage);
+
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 3000);
+    }
   }
 
   return (
@@ -55,7 +86,7 @@ export default function Login() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -67,7 +98,7 @@ export default function Login() {
             />
             <FormField
               control={form.control}
-              name="password"
+              name="senha"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -77,6 +108,15 @@ export default function Login() {
                 </FormItem>
               )}
             />
+
+            {/* Div para exibir o erro */}
+            {errorMessage && (
+              <div className="bg-red-500 rounded-md py-2 text-white justify-center flex items-center gap-x-2">
+                <Icon name="TriangleAlert" />
+                {errorMessage}
+              </div>
+            )}
+
             <Button type="submit" className="w-full capitalize font-semibold">
               entrar
             </Button>

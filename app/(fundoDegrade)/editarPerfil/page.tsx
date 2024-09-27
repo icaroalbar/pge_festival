@@ -58,7 +58,7 @@ export default function Cadastro() {
   function onSubmit(data: z.infer<typeof formSchema>) {
     console.log(data);
 
-    router.push("/");
+    router.push("/perfil");
   }
 
   return (
@@ -66,7 +66,7 @@ export default function Cadastro() {
       title="Editar perfil"
       description="Atualize seus dados acessar"
       linkTextFooter="Sair"
-      hrefTextFooter="/"
+      hrefTextFooter="/perfil"
       className="border border-primary/70 shadow-xl"
     >
       <div className="flex flex-col">

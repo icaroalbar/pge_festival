@@ -43,7 +43,7 @@ export default function Regras() {
   useEffect(() => {
     const confirmacaoRegras = localStorage.getItem("confirmacaoRegras");
     if (confirmacaoRegras && JSON.parse(confirmacaoRegras)) {
-      router.push("/perguntas");
+      router.push("/");
     } else {
       setIsChecking(false);
     }

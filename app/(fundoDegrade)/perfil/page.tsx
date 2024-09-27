@@ -23,7 +23,7 @@ export default function Perfil() {
       title="[Nome Usuário]"
       description="[email do usuario]"
       linkTextFooter="voltar"
-      hrefTextFooter="/"
+      hrefTextFooter="/home"
       className="border border-primary/70 shadow-xl"
     >
       <div className="flex flex-col">
