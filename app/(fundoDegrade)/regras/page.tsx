@@ -43,7 +43,7 @@ export default function Regras() {
   useEffect(() => {
     const confirmacaoRegras = localStorage.getItem("confirmacaoRegras");
     if (confirmacaoRegras && JSON.parse(confirmacaoRegras)) {
-      router.push("/");
+      router.push("/perguntas");
     } else {
       setIsChecking(false);
     }
@@ -56,7 +56,7 @@ export default function Regras() {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     localStorage.setItem("confirmacaoRegras", JSON.stringify(data.confirmacao));
 
-    router.push("/");
+    router.push("/perguntas");
   }
 
   return (

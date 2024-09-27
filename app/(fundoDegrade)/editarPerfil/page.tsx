@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import CardAuth from "@/components/ui/cardAuth";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   username: z.optional(
@@ -33,6 +34,9 @@ const formSchema = z.object({
 });
 
 export default function Cadastro() {
+  const [isChecking, setIsChecking] = useState<boolean>(true);
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,7 +47,13 @@ export default function Cadastro() {
     },
   });
 
-  const router = useRouter();
+  useEffect(() => {
+    setIsChecking(false);
+  }, []);
+
+  if (isChecking) {
+    return null;
+  }
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     console.log(data);

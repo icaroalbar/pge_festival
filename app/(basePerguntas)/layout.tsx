@@ -8,14 +8,14 @@ export default function FundoDegradeBrancoLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="bg-gray-300 h-screen">
+    <div className="bg-gray-200 h-screen">
       <header className="flex justify-between gap-2 items-center px-2 py-3 bg-primary shadow-md">
         <Button
           className="text-white shadow-none hover:bg-transparent hover:text-white"
           size="icon"
           asChild
         >
-          <Link href={"/"}>
+          <Link href={"/home"}>
             <Icon name="House" />
           </Link>
         </Button>

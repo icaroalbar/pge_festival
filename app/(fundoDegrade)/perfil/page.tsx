@@ -3,8 +3,21 @@
 import { Button } from "@/components/ui/button";
 import CardAuth from "@/components/ui/cardAuth";
 import Link from "next/link";
+// import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Perfil() {
+  const [isChecking, setIsChecking] = useState<boolean>(true);
+  // const router = useRouter();
+
+  useEffect(() => {
+    setIsChecking(false);
+  }, []);
+
+  if (isChecking) {
+    return null;
+  }
+
   return (
     <CardAuth
       title="[Nome Usuário]"

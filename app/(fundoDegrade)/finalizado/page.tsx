@@ -5,20 +5,15 @@ import CardAuth from "@/components/ui/cardAuth";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 export default function Finalizado() {
   const [isChecking, setIsChecking] = useState<boolean>(true);
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
-    const confirmacaoRegras = localStorage.getItem("confirmacaoRegras");
-    if (confirmacaoRegras && JSON.parse(confirmacaoRegras)) {
-      router.push("/");
-    } else {
-      setIsChecking(false);
-    }
-  }, [router]);
+    setIsChecking(false);
+  }, []);
 
   if (isChecking) {
     return null;
@@ -38,7 +33,7 @@ export default function Finalizado() {
           Até a próxima aventura!
         </h4>
         <Button className="font-semibold w-full lg:w-2/4 my-2" asChild>
-          <Link href={"#"}>Página inicial</Link>
+          <Link href={"/home"}>Página inicial</Link>
         </Button>
       </div>
     </CardAuth>
