@@ -66,6 +66,12 @@ export default function Perguntas() {
 
   // UseEffect para gerenciar o temporizador
   useEffect(() => {
+    const dataUser = localStorage.getItem("dataUser");
+
+    if (!dataUser) {
+      router.push("/");
+    }
+
     setIsChecking(false);
     // Reinicia o temporizador toda vez que isQuestionNum mudar
     setTimer(30);
@@ -81,7 +87,7 @@ export default function Perguntas() {
     }, 1000);
 
     return () => clearInterval(countdown); // Limpa o intervalo ao desmontar
-  }, [isQuestionNum]); // Dependência adicionada aqui
+  }, [router]);
 
   if (isChecking) {
     return null;

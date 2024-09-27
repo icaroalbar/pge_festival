@@ -1,12 +1,34 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icons";
+import { PaginaCarregamento } from "@/components/ui/paginaCarregamento";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function FundoDegradeBrancoLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const dataUser = localStorage.getItem("dataUser");
+
+    if (!dataUser) {
+      router.push("/");
+    } else {
+      setLoading(false);
+    }
+  }, [router]);
+
+  if (loading) {
+    return <PaginaCarregamento />;
+  }
+
   return (
     <div className="bg-gray-200 h-screen">
       <header className="flex justify-between gap-2 items-center px-2 py-3 bg-primary shadow-md">

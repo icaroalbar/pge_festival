@@ -16,13 +16,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { PaginaCarregamento } from "@/components/ui/paginaCarregamento";
 
 export default function Home() {
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const dataUser = localStorage.getItem("dataUser");
+    if (!dataUser) {
+      router.push("/");
+    } else {
+      setLoading(false); // Termina o carregamento quando a verificação é concluída
+    }
+  }, [router]);
+
+  if (loading) {
+    return <PaginaCarregamento />;
+  }
+
   const LogOut = () => {
     localStorage.removeItem("dataUser");
     router.push("/");
   };
+
   return (
     <div className="bg-gray-200 h-screen">
       <nav className="bg-primary shadow-md text-white font-semibold text-2xl flex justify-between items-center p-4">

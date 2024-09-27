@@ -29,7 +29,8 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Estado para armazenar o erro
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [disabledForm, setDisabledForm] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,6 +46,7 @@ export default function Login() {
   const router = useRouter();
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    setDisabledForm(true);
     try {
       setErrorMessage(null); // Reseta a mensagem de erro
       const user = await axios.post(
@@ -70,6 +72,8 @@ export default function Login() {
       setTimeout(() => {
         setErrorMessage(null);
       }, 3000);
+    } finally {
+      setDisabledForm(false);
     }
   }
 
@@ -90,7 +94,11 @@ export default function Login() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="E-mail" {...field} />
+                    <Input
+                      disabled={disabledForm}
+                      placeholder="E-mail"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -102,7 +110,12 @@ export default function Login() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input type="password" placeholder="Senha" {...field} />
+                    <Input
+                      disabled={disabledForm}
+                      type="password"
+                      placeholder="Senha"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -117,17 +130,27 @@ export default function Login() {
               </div>
             )}
 
-            <Button type="submit" className="w-full capitalize font-semibold">
-              entrar
+            <Button
+              disabled={disabledForm}
+              type="submit"
+              className="w-full capitalize font-semibold"
+            >
+              {disabledForm ? (
+                <Icon name="LoaderCircle" className="animate-spin" />
+              ) : (
+                "entrar"
+              )}
             </Button>
           </form>
         </Form>
-        <Link
-          href="/recuperarSenha"
-          className="text-start text-xs my-2 font-medium text-ring underline-offset-4 hover:underline"
-        >
-          Esqueci minha senha
-        </Link>
+        <div>
+          <Link
+            href="/recuperarSenha"
+            className="text-start text-xs my-2 font-medium text-ring underline-offset-4 hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
       </div>
     </CardAuth>
   );

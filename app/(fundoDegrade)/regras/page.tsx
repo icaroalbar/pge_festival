@@ -42,7 +42,11 @@ export default function Regras() {
 
   useEffect(() => {
     const confirmacaoRegras = localStorage.getItem("confirmacaoRegras");
+    const dataUser = localStorage.getItem("dataUser");
+
     if (confirmacaoRegras && JSON.parse(confirmacaoRegras)) {
+      router.push("/perguntas");
+    } else if (!dataUser) {
       router.push("/");
     } else {
       setIsChecking(false);
