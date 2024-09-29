@@ -15,9 +15,10 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import CardAuth from "@/components/ui/cardAuth";
 import { useEffect, useState } from "react";
+import { useUser } from "@/app/hook/UserProvider";
 
 const formSchema = z.object({
-  username: z.optional(
+  email: z.optional(
     z.string().min(2, {
       message: "O campo de e-mail é obrigatório.",
     })
@@ -36,11 +37,12 @@ const formSchema = z.object({
 export default function Cadastro() {
   const [isChecking, setIsChecking] = useState<boolean>(true);
   const router = useRouter();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
       primeronome: "",
       ultimonome: "",
       setor: "",
@@ -64,8 +66,8 @@ export default function Cadastro() {
   return (
     <CardAuth
       title="Editar perfil"
-      description="Atualize seus dados acessar"
-      linkTextFooter="Sair"
+      description="Atualize seus dados"
+      linkTextFooter="Voltar"
       hrefTextFooter="/perfil"
       className="border border-primary/70 shadow-xl"
     >
@@ -75,11 +77,11 @@ export default function Cadastro() {
             <FormField
               disabled
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="E-mail" {...field} />
+                    <Input placeholder={user?.email} {...field} />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -91,7 +93,7 @@ export default function Cadastro() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Primeiro nome" {...field} />
+                    <Input placeholder={user?.primeiroNome} {...field} />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -103,7 +105,7 @@ export default function Cadastro() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Último nome" {...field} />
+                    <Input placeholder={user?.ultimoNome} {...field} />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -115,7 +117,7 @@ export default function Cadastro() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Setor" {...field} />
+                    <Input placeholder={user?.setor} {...field} />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>

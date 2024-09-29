@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import axios, { AxiosError } from "axios";
 import Icon from "@/components/ui/icons";
 import { useState } from "react"; // Import para o estado de erro
+import { useUser } from "@/app/hook/UserProvider";
 
 const formSchema = z.object({
   email: z.string().min(2, {
@@ -31,6 +32,7 @@ const formSchema = z.object({
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [disabledForm, setDisabledForm] = useState<boolean>(false);
+  const { setUser } = useUser();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,36 +41,38 @@ export default function Login() {
     },
   });
 
-  interface ErrorResponse {
-    error: string;
-  }
-
   const router = useRouter();
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setDisabledForm(true);
     try {
       setErrorMessage(null); // Reseta a mensagem de erro
-      const user = await axios.post(
+      const response = await axios.post(
         "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/login",
         data
       );
-      if (user) {
+
+      // Verifica se a resposta é um array e contém pelo menos um objeto
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        const userData = response.data[0]; // Acessa o primeiro objeto do array
+        setUser(userData); // Armazena os dados do usuário no contexto
+
+        // Armazena o login no localStorage
         localStorage.setItem("dataUser", JSON.stringify(true));
+
+        // Redireciona para a página "home"
         router.push("/home");
+      } else {
+        throw new Error("Nenhum usuário encontrado na resposta."); // Tratamento de erro caso o array esteja vazio
       }
     } catch (error: unknown) {
-      // Verifica se o erro é do tipo AxiosError
-      const axiosError = error as AxiosError<ErrorResponse>;
-
-      // Verifica se a resposta contém a propriedade 'error'
+      const axiosError = error as AxiosError<{ error: string }>;
       const errorMessage =
         axiosError.response?.data?.error ??
         "Erro ao realizar login. Tente novamente.";
-
-      // Captura o erro e atualiza o estado
       setErrorMessage(errorMessage);
 
+      // Limpa a mensagem de erro após 3 segundos
       setTimeout(() => {
         setErrorMessage(null);
       }, 3000);

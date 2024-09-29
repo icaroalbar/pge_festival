@@ -18,17 +18,20 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PaginaCarregamento } from "@/components/ui/paginaCarregamento";
+import { useUser } from "../hook/UserProvider";
+import { Ranking } from "@/components/ui/ranking";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { user } = useUser();
 
   useEffect(() => {
     const dataUser = localStorage.getItem("dataUser");
     if (!dataUser) {
       router.push("/");
     } else {
-      setLoading(false); // Termina o carregamento quando a verificação é concluída
+      setLoading(false);
     }
   }, [router]);
 
@@ -48,8 +51,9 @@ export default function Home() {
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
-              <AvatarFallback className="bg-secondary/60 text-base">
-                CN
+              <AvatarFallback className="bg-secondary/60 text-base uppercase">
+                {user?.primeiroNome?.charAt(0)}
+                {user?.ultimoNome?.charAt(0)}
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
@@ -92,7 +96,7 @@ export default function Home() {
             value="jogos"
             className="flex px-6 gap-5 flex-col items-center"
           >
-            <Card className="w-full">
+            <Card className="w-full mt-4">
               <CardContent className="flex py-6 justify-between items-center">
                 <div className="w-1/3 text-transparent h-16 bg-[url('https://pge-festival.s3.amazonaws.com/dia-do-servidor.jpeg')] bg-cover">
                   *
@@ -119,7 +123,9 @@ export default function Home() {
               <Link href={"/regras"}>começar</Link>
             </Button>
           </TabsContent>
-          <TabsContent value="ranking">Change your password here.</TabsContent>
+          <TabsContent value="ranking">
+            <Ranking />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
