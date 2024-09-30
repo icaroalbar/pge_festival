@@ -20,23 +20,33 @@ import Icon from "@/components/ui/icons";
 
 const formSchema = z
   .object({
-    email: z.string().min(2, {
-      message: "O campo de e-mail é obrigatório.",
-    }),
+    email: z
+      .string()
+      .min(2, { message: "O campo de e-mail é obrigatório." })
+      .email({ message: "E-mail inválido." })
+      .refine((email) => email.endsWith("@pge.rj.gov.br"), {
+        message: "O e-mail deve ser do domínio @pge.rj.gov.br.",
+      }),
+
     primeiroNome: z.string().min(2, {
       message: "O campo primeiro nome é obrigatório.",
     }),
+
     ultimoNome: z.string().min(2, {
       message: "O campo de último nome é obrigatório.",
     }),
+
     senha: z.string().min(6, {
       message: "A senha deve ter no mínimo 6 caracteres.",
     }),
+
     confirmarSenha: z.string().min(6, {
       message: "A confirmação da senha deve ter no mínimo 6 caracteres.",
     }),
+
     setor: z.optional(z.string()),
   })
+
   .refine((data) => data.senha === data.confirmarSenha, {
     path: ["confirmarSenha"],
     message: "As senhas precisam ser iguais.",

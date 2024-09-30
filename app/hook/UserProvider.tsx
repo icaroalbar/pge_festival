@@ -19,6 +19,7 @@ interface User {
   lastQuestion?: number;
   primeiroNome?: string;
   ultimoNome?: string;
+  timer?: number;
 }
 
 // Definir o tipo do contexto para incluir o usuário e a função setUser

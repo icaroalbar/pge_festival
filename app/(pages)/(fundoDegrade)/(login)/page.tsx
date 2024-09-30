@@ -17,13 +17,17 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import axios, { AxiosError } from "axios";
 import Icon from "@/components/ui/icons";
-import { useState } from "react"; // Import para o estado de erro
+import { useState } from "react";
 import { useUser } from "@/app/hook/UserProvider";
 
 const formSchema = z.object({
-  email: z.string().min(2, {
-    message: "O campo de e-mail é obrigatório.",
-  }),
+  email: z
+    .string()
+    .min(2, { message: "O campo de e-mail é obrigatório." })
+    .email({ message: "E-mail inválido." })
+    .refine((email) => email.endsWith("@pge.rj.gov.br"), {
+      message: "O e-mail deve ser do domínio @pge.rj.gov.br.",
+    }),
   senha: z.string().min(2, {
     message: "O campo de senha é obrigatório.",
   }),
@@ -46,24 +50,21 @@ export default function Login() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setDisabledForm(true);
     try {
-      setErrorMessage(null); // Reseta a mensagem de erro
+      setErrorMessage(null);
       const response = await axios.post(
         "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/login",
         data
       );
 
-      // Verifica se a resposta é um array e contém pelo menos um objeto
       if (Array.isArray(response.data) && response.data.length > 0) {
-        const userData = response.data[0]; // Acessa o primeiro objeto do array
-        setUser(userData); // Armazena os dados do usuário no contexto
+        const userData = response.data[0];
+        setUser(userData);
 
-        // Armazena o login no localStorage
         localStorage.setItem("dataUser", JSON.stringify(true));
 
-        // Redireciona para a página "home"
         router.push("/home");
       } else {
-        throw new Error("Nenhum usuário encontrado na resposta."); // Tratamento de erro caso o array esteja vazio
+        throw new Error("Nenhum usuário encontrado na resposta.");
       }
     } catch (error: unknown) {
       const axiosError = error as AxiosError<{ error: string }>;
@@ -72,7 +73,6 @@ export default function Login() {
         "Erro ao realizar login. Tente novamente.";
       setErrorMessage(errorMessage);
 
-      // Limpa a mensagem de erro após 3 segundos
       setTimeout(() => {
         setErrorMessage(null);
       }, 3000);
@@ -125,8 +125,6 @@ export default function Login() {
                 </FormItem>
               )}
             />
-
-            {/* Div para exibir o erro */}
             {errorMessage && (
               <div className="bg-red-500 rounded-md py-2 text-white justify-center flex items-center gap-x-2">
                 <Icon name="TriangleAlert" />

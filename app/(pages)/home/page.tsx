@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PaginaCarregamento } from "@/components/ui/paginaCarregamento";
-import { useUser } from "../hook/UserProvider";
+import { useUser } from "../../hook/UserProvider";
 import { Ranking } from "@/components/ui/ranking";
 
 export default function Home() {
@@ -99,7 +99,7 @@ export default function Home() {
           >
             <Card className="w-full mt-4">
               <CardContent className="flex py-6 justify-between items-center">
-                <div className="w-1/3 text-transparent h-16 bg-[url('https://pge-festival.s3.amazonaws.com/dia-do-servidor.jpeg')] bg-cover">
+                <div className="w-1/3 rounded-md text-transparent h-16 bg-[url('https://pge-festival.s3.amazonaws.com/dia-do-servidor.jpeg')] bg-cover">
                   *
                 </div>
                 <RadioGroup defaultValue="option-one">
