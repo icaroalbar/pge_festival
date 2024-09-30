@@ -27,6 +27,7 @@ import { useUser } from "@/app/hook/UserProvider";
 interface Pergunta {
   questionNum: number;
   question: string;
+  correctAnswer: number;
 }
 
 interface Resposta {
@@ -110,6 +111,28 @@ export default function Perguntas() {
       setTimer((prev) => {
         if (prev <= 1) {
           clearInterval(countdown);
+
+          const perguntaAtual = data?.perguntas.find(
+            (item: Pergunta) => item.questionNum === isQuestionNum
+          );
+
+          const respostasAtuais = data?.respostas.filter(
+            (resposta: Resposta) => resposta.questionNum === isQuestionNum
+          );
+
+          const selectedAnswer = form.getValues("type"); // Obter a resposta selecionada
+          const selectedResposta = respostasAtuais?.find(
+            (resposta) => resposta.description === selectedAnswer
+          );
+
+          // Verifica se uma resposta foi selecionada
+          if (selectedResposta) {
+            // Se uma resposta foi selecionada, verifica se é a correta
+            if (selectedResposta.questionNum === perguntaAtual?.correctAnswer) {
+              setIsScoreUser((prev) => prev + 100); // Incrementa a pontuação
+            }
+          }
+
           setIsQuestionNum((prev) => prev + 1); // Incrementa o número da pergunta
           setTimer(30); // Reseta o temporizador
         }
@@ -118,7 +141,12 @@ export default function Perguntas() {
     }, 1000);
 
     return () => clearInterval(countdown); // Limpa o intervalo ao desmontar
-  }, [router]);
+  }, [
+    isQuestionNum,
+    router,
+    form,
+    data, // Adicione 'data' ao array de dependências
+  ]);
 
   useEffect(() => {
     const updateScoreIfFinished = async () => {
@@ -149,13 +177,6 @@ export default function Perguntas() {
     return <p>Carregando...</p>;
   }
 
-  async function onSubmit() {
-    if (isQuestionNum < data!.perguntas.length) {
-      setIsQuestionNum((prev) => prev + 1);
-      setIsScoreUser((prev) => prev + 100);
-    }
-  }
-
   const perguntaAtual = data.perguntas.find(
     (item: Pergunta) => item.questionNum === isQuestionNum
   );
@@ -163,6 +184,22 @@ export default function Perguntas() {
   const respostasAtuais = data.respostas.filter(
     (resposta: Resposta) => resposta.questionNum === isQuestionNum
   );
+
+  async function onSubmit() {
+    const selectedAnswer = form.getValues("type");
+    const selectedResposta = respostasAtuais.find(
+      (resposta) => resposta.description === selectedAnswer
+    );
+    console.log(selectedResposta?.optionNum);
+    console.log(perguntaAtual?.correctAnswer);
+    if (selectedResposta?.optionNum === perguntaAtual?.correctAnswer) {
+      setIsScoreUser((prev) => prev + 100);
+    }
+
+    if (isQuestionNum < data!.perguntas.length) {
+      setIsQuestionNum((prev) => prev + 1);
+    }
+  }
 
   if (!perguntaAtual) {
     router.push("/finalizado");
@@ -231,14 +268,21 @@ export default function Perguntas() {
                   </FormItem>
                 )}
               />
-              <Button className="font-semibold w-full" type="submit">
+              <Button
+                className={`font-semibold w-full ${
+                  isQuestionNum === 9999 && "hidden"
+                }`}
+                type="submit"
+              >
                 Avançar
               </Button>
             </form>
           </Form>
           <Button
             onClick={() => updateUserScore(isQuestionNum)}
-            className="bg-muted-foreground hover:bg-muted-foreground/90 font-semibold w-full lg:w-2/4 my-2"
+            className={`bg-muted-foreground hover:bg-muted-foreground/90 font-semibold w-full lg:w-2/4 my-2 ${
+              isQuestionNum === 9999 && "hidden"
+            }`}
             asChild
           >
             <Link href="/home">Continuar depois</Link>

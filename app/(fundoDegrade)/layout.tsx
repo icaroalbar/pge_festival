@@ -6,7 +6,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex flex-col gap-2 px-4 items-center py-16 justify-between antialiased bg-secondary bg-gradient-to-b from-primary to-secondary">
+    <div className="flex flex-col gap-2 min-h-screen px-4 items-center py-16 justify-between antialiased bg-secondary bg-gradient-to-b from-primary to-secondary">
       <header>
         <Image
           src="https://pge-festival.s3.amazonaws.com/logotipo-pg-inova.png"
@@ -16,7 +16,7 @@ export default function RootLayout({
           priority
         />
       </header>
-      {children}
+      <main className="flex-grow w-full">{children}</main>
       <footer>
         <Image
           src="https://pge-festival.s3.amazonaws.com/logo-pg-inova.png"
