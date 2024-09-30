@@ -6,6 +6,7 @@ import {
   useState,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 
 // Definir a interface para o tipo de usuário que será armazenado no contexto
@@ -47,6 +48,23 @@ export function UserProvider({
   children: React.ReactNode;
 }>) {
   const [user, setUser] = useState<User | null>(null); // Estado para armazenar o usuário
+
+  // Carregar os dados do localStorage na inicialização
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  // Salvar os dados no localStorage quando o estado do usuário mudar
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

@@ -36,8 +36,6 @@ export function Ranking() {
     () => fetchData(user?.id || 0)
   );
 
-  console.log(data);
-
   if (error) {
     return <p>Houve um erro ao carregar o ranking</p>;
   }

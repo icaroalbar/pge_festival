@@ -16,36 +16,29 @@ import { Input } from "@/components/ui/input";
 import CardAuth from "@/components/ui/cardAuth";
 import { useEffect, useState } from "react";
 import { useUser } from "@/app/hook/UserProvider";
+import axios from "axios";
+import Icon from "@/components/ui/icons";
 
 const formSchema = z.object({
-  email: z.optional(
-    z.string().min(2, {
-      message: "O campo de e-mail é obrigatório.",
-    })
-  ),
-  primeronome: z.string().min(2, {
-    message: "O campo de e-mail é obrigatório.",
-  }),
-  ultimonome: z.string().min(2, {
-    message: "O campo de senha é obrigatório.",
-  }),
-  setor: z.string().min(2, {
-    message: "O campo de senha é obrigatório.",
-  }),
+  email: z.optional(z.string()),
+  primeiroNome: z.optional(z.string()),
+  ultimoNome: z.optional(z.string()),
+  setor: z.optional(z.string()),
 });
 
 export default function Cadastro() {
   const [isChecking, setIsChecking] = useState<boolean>(true);
+  const [isDisabledForm, setIsDisabledForm] = useState<boolean>(false);
   const router = useRouter();
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      primeronome: "",
-      ultimonome: "",
-      setor: "",
+      email: user?.email || "", // Define os valores padrão a partir do user
+      primeiroNome: user?.primeiroNome || "",
+      ultimoNome: user?.ultimoNome || "",
+      setor: user?.setor || "",
     },
   });
 
@@ -57,10 +50,40 @@ export default function Cadastro() {
     return null;
   }
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsDisabledForm(true);
 
-    router.push("/perfil");
+    try {
+      // Filtra os campos que possuem valores, ignorando a chave no filtro
+      const updatedFields = Object.fromEntries(
+        Object.entries(data).filter(([value]) => value !== "" && value !== null)
+      );
+
+      // Verifica se há campos preenchidos antes de fazer a requisição
+      if (Object.keys(updatedFields).length > 0) {
+        await axios.put(
+          "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/update",
+          {
+            id: user?.id,
+            ...updatedFields,
+          }
+        );
+
+        // Atualiza o provider apenas com os campos preenchidos, mantendo os anteriores
+        setUser((prevUser) => ({
+          ...prevUser, // Mantém todos os valores anteriores
+          ...updatedFields, // Atualiza apenas os campos preenchidos
+        }));
+
+        router.push("/perfil");
+      } else {
+        console.warn("Nenhum campo foi preenchido");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDisabledForm(false);
+    }
   }
 
   return (
@@ -81,7 +104,7 @@ export default function Cadastro() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder={user?.email} {...field} />
+                    <Input disabled={isDisabledForm} {...field} />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -89,11 +112,15 @@ export default function Cadastro() {
             />
             <FormField
               control={form.control}
-              name="primeronome"
+              name="primeiroNome"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder={user?.primeiroNome} {...field} />
+                    <Input
+                      disabled={isDisabledForm}
+                      placeholder={user?.primeiroNome}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -101,11 +128,15 @@ export default function Cadastro() {
             />
             <FormField
               control={form.control}
-              name="ultimonome"
+              name="ultimoNome"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder={user?.ultimoNome} {...field} />
+                    <Input
+                      disabled={isDisabledForm}
+                      placeholder={user?.ultimoNome}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
@@ -117,14 +148,26 @@ export default function Cadastro() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder={user?.setor} {...field} />
+                    <Input
+                      disabled={isDisabledForm}
+                      placeholder={user?.setor}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full capitalize font-semibold">
-              salvar
+            <Button
+              disabled={isDisabledForm}
+              type="submit"
+              className="w-full capitalize font-semibold"
+            >
+              {isDisabledForm ? (
+                <Icon name="LoaderCircle" className="animate-spin" />
+              ) : (
+                "salvar"
+              )}
             </Button>
           </form>
         </Form>

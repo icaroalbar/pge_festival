@@ -41,6 +41,7 @@ export default function Home() {
 
   const LogOut = () => {
     localStorage.removeItem("dataUser");
+    localStorage.removeItem("user");
     router.push("/");
   };
 
