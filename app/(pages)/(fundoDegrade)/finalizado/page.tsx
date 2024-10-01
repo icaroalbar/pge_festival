@@ -20,7 +20,7 @@ export default function Finalizado() {
   }
 
   return (
-    <CardAuth title="Parabéns! Você finalizou o desafio!">
+    <CardAuth title="Parabéns, você finalizou o desafio!">
       <div className="flex flex-col justify-center items-center">
         <Image
           src="https://pge-festival.s3.amazonaws.com/game-finalizado.jpeg"

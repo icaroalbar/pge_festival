@@ -14,27 +14,45 @@ import {
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import Icon from "@/components/ui/icons";
+import axios from "axios";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "O campo de e-mail é obrigatório.",
-  }),
+  email: z
+    .string()
+    .min(2, { message: "O campo de e-mail é obrigatório." })
+    .email({ message: "E-mail inválido." }),
+  // .refine((email) => email.endsWith("@pge.rj.gov.br"), {
+  //   message: "O e-mail deve ser do domínio @pge.rj.gov.br.",
+  // }),
 });
 
 export default function RecuperarSenha() {
+  const [disabledForm, setDisabledForm] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
     },
   });
 
   const router = useRouter();
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    setDisabledForm(true);
 
-    router.push("/");
+    try {
+      await axios.post(
+        "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/forgot-password",
+        data
+      );
+      router.push("/emailEnviado");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDisabledForm(false);
+    }
   }
 
   return (
@@ -49,18 +67,30 @@ export default function RecuperarSenha() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="E-mail" {...field} />
+                    <Input
+                      disabled={disabledForm}
+                      placeholder="E-mail"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage className="text-start ml-2" />
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full capitalize font-semibold">
-              enviar
+            <Button
+              disabled={disabledForm}
+              type="submit"
+              className="w-full capitalize font-semibold"
+            >
+              {disabledForm ? (
+                <Icon name="LoaderCircle" className="animate-spin" />
+              ) : (
+                "enviar"
+              )}
             </Button>
           </form>
         </Form>

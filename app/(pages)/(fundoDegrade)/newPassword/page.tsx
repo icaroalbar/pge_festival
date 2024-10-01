@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import CardAuth from "@/components/ui/cardAuth";
 import axios, { AxiosError } from "axios";
@@ -20,22 +20,6 @@ import Icon from "@/components/ui/icons";
 
 const formSchema = z
   .object({
-    email: z
-      .string()
-      .min(2, { message: "O campo de e-mail é obrigatório." })
-      .email({ message: "E-mail inválido." })
-      .refine((email) => email.endsWith("@pge.rj.gov.br"), {
-        message: "O e-mail deve ser do domínio @pge.rj.gov.br.",
-      }),
-
-    primeiroNome: z.string().min(2, {
-      message: "O campo primeiro nome é obrigatório.",
-    }),
-
-    ultimoNome: z.string().min(2, {
-      message: "O campo de último nome é obrigatório.",
-    }),
-
     senha: z.string().min(6, {
       message: "A senha deve ter no mínimo 6 caracteres.",
     }),
@@ -43,8 +27,6 @@ const formSchema = z
     confirmarSenha: z.string().min(6, {
       message: "A confirmação da senha deve ter no mínimo 6 caracteres.",
     }),
-
-    setor: z.optional(z.string()),
   })
 
   .refine((data) => data.senha === data.confirmarSenha, {
@@ -61,32 +43,32 @@ export default function Cadastro() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
       senha: "",
       confirmarSenha: "",
-      primeiroNome: "",
-      ultimoNome: "",
-      setor: "",
     },
   });
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email");
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setDisabledForm(true);
 
     try {
       setErrorMessage(null);
-      await axios.post(
-        "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/create",
-        data
+      await axios.put(
+        "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/new-password",
+        {
+          email: email,
+          password: data.senha,
+        }
       );
 
       router.push("/");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ErrorResponse>;
 
-      // Verifica se a resposta contém a propriedade 'error'
       const errorMessage =
         axiosError.response?.data?.error ??
         "Erro ao realizar login. Tente novamente.";
@@ -104,11 +86,9 @@ export default function Cadastro() {
 
   return (
     <CardAuth
-      title="Vamos começar!"
-      description="Crie sua conta para acessar"
-      textFooter="Já possui uma conta?"
-      linkTextFooter="Clique aqui"
-      hrefTextFooter="/"
+      title="Nova senha"
+      description="Crie uma nova senha para o e-mail"
+      email={email || "Email não encontrado"}
     >
       <div className="flex flex-col">
         {errorMessage && (
@@ -119,22 +99,6 @@ export default function Cadastro() {
         )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={disabledForm}
-                      placeholder="E-mail"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-start ml-2" />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="senha"
@@ -169,54 +133,6 @@ export default function Cadastro() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="primeiroNome"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={disabledForm}
-                      placeholder="Primeiro nome"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-start ml-2" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="ultimoNome"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={disabledForm}
-                      placeholder="Último nome"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-start ml-2" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="setor"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Input
-                      disabled={disabledForm}
-                      placeholder="Setor"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-start ml-2" />
-                </FormItem>
-              )}
-            />
             <Button
               disabled={disabledForm}
               type="submit"
@@ -225,7 +141,7 @@ export default function Cadastro() {
               {disabledForm ? (
                 <Icon name="LoaderCircle" className="animate-spin" />
               ) : (
-                "cadastrar"
+                "atualizar"
               )}
             </Button>
           </form>

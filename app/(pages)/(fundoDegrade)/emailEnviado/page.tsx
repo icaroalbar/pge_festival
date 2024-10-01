@@ -5,7 +5,7 @@ export default function EmailEnviado() {
   return (
     <CardAuth
       title="Email enviado!"
-      description="Verifique sua caixa de entrada"
+      description="Verifique sua caixa de entrada. Caso não encontre, verifique na caixa de span."
       linkTextFooter="Página inicial"
       hrefTextFooter="/"
       className="relative pt-24"
