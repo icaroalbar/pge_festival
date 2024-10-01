@@ -15,29 +15,29 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import CardAuth from "@/components/ui/cardAuth";
 import axios, { AxiosError } from "axios";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Icon from "@/components/ui/icons";
 
+// Schema de validação
 const formSchema = z
   .object({
     senha: z.string().min(6, {
       message: "A senha deve ter no mínimo 6 caracteres.",
     }),
-
     confirmarSenha: z.string().min(6, {
       message: "A confirmação da senha deve ter no mínimo 6 caracteres.",
     }),
   })
-
   .refine((data) => data.senha === data.confirmarSenha, {
     path: ["confirmarSenha"],
     message: "As senhas precisam ser iguais.",
   });
+
 interface ErrorResponse {
   error: string;
 }
 
-export default function Cadastro() {
+function NewPasswordForm() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [disabledForm, setDisabledForm] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,14 +68,11 @@ export default function Cadastro() {
       router.push("/");
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ErrorResponse>;
-
       const errorMessage =
         axiosError.response?.data?.error ??
         "Erro ao realizar login. Tente novamente.";
 
-      // Captura o erro e atualiza o estado
       setErrorMessage(errorMessage);
-
       setTimeout(() => {
         setErrorMessage(null);
       }, 3000);
@@ -148,5 +145,13 @@ export default function Cadastro() {
         </Form>
       </div>
     </CardAuth>
+  );
+}
+
+export default function Cadastro() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <NewPasswordForm />
+    </Suspense>
   );
 }

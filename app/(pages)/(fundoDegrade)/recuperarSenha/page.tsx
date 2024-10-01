@@ -22,10 +22,10 @@ const formSchema = z.object({
   email: z
     .string()
     .min(2, { message: "O campo de e-mail é obrigatório." })
-    .email({ message: "E-mail inválido." }),
-  // .refine((email) => email.endsWith("@pge.rj.gov.br"), {
-  //   message: "O e-mail deve ser do domínio @pge.rj.gov.br.",
-  // }),
+    .email({ message: "E-mail inválido." })
+    .refine((email) => email.endsWith("@pge.rj.gov.br"), {
+      message: "O e-mail deve ser do domínio @pge.rj.gov.br.",
+    }),
 });
 
 export default function RecuperarSenha() {
