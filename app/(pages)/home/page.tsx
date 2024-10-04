@@ -14,7 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { PaginaCarregamento } from "@/components/ui/paginaCarregamento";
@@ -50,8 +50,13 @@ export default function Home() {
       <nav className="bg-primary shadow-md text-white font-semibold text-2xl flex justify-between items-center p-4">
         <h2>PGames</h2>
         <DropdownMenu>
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger className="flex items-center gap-x-2">
+            <Icon name="ChevronDown" />
             <Avatar>
+              <AvatarImage
+                src={user?.urlImage || "#"}
+                alt="Imagem do usuário"
+              />
               <AvatarFallback className="bg-secondary/60 text-base uppercase">
                 {user?.primeiroNome?.charAt(0)}
                 {user?.ultimoNome?.charAt(0)}

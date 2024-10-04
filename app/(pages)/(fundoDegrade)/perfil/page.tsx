@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import CardAuth from "@/components/ui/cardAuth";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Perfil() {
   const [isChecking, setIsChecking] = useState<boolean>(true);
@@ -24,8 +25,15 @@ export default function Perfil() {
       description={user?.email}
       linkTextFooter="voltar"
       hrefTextFooter="/home"
-      className="border border-primary/70 shadow-xl"
+      className="border border-primary/70 shadow-xl relative"
     >
+      <Avatar className="absolute top-8 right-10">
+        <AvatarImage src={user?.urlImage || "#"} alt="Imagem do usuário" />
+        <AvatarFallback className="bg-secondary/60 text-base uppercase">
+          {user?.primeiroNome?.charAt(0)}
+          {user?.ultimoNome?.charAt(0)}
+        </AvatarFallback>
+      </Avatar>
       <div className="flex flex-col">
         <p className="text-end text-sm text-muted-foreground">
           Pontuação: {user?.score}

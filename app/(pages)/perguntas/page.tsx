@@ -96,6 +96,25 @@ export default function Perguntas() {
     [user, isScoreUser, setUser]
   );
 
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // Atualiza a pontuação antes de fechar ou sair
+      updateUserScore(isQuestionNum, timer);
+
+      // Opcional: Exibir um alerta de confirmação ao tentar fechar ou recarregar
+      event.preventDefault();
+      event.returnValue = ""; // Necessário para alguns navegadores mostrarem o alerta padrão de confirmação
+    };
+
+    // Adiciona o listener ao evento `beforeunload`
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Limpa o listener ao desmontar o componente
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [updateUserScore, isQuestionNum, timer, router]);
+
   // useEffect para gerenciar o temporizador e atualizar a pontuação
   useEffect(() => {
     const dataUser = localStorage.getItem("dataUser");

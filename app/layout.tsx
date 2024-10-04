@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PGE Games",
+  title: "PG Games",
   description: "Jogos para a equipe da PGE",
 };
 

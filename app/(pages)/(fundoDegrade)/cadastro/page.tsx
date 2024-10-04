@@ -17,6 +17,7 @@ import CardAuth from "@/components/ui/cardAuth";
 import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import Icon from "@/components/ui/icons";
+import { Label } from "@/components/ui/label";
 
 const formSchema = z
   .object({
@@ -45,12 +46,28 @@ const formSchema = z
     }),
 
     setor: z.optional(z.string()),
+    files: z
+      .any()
+      .refine((file) => file.size <= 10 * 1024 * 1024, {
+        message: "O arquivo deve ter no máximo 10 MB",
+      })
+      .refine(
+        (file) => {
+          const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+          return validTypes.includes(file.type);
+        },
+        {
+          message: "Apenas arquivos de imagem (JPEG, PNG, JPG) são permitidos",
+        }
+      )
+      .optional(),
   })
 
   .refine((data) => data.senha === data.confirmarSenha, {
     path: ["confirmarSenha"],
     message: "As senhas precisam ser iguais.",
   });
+
 interface ErrorResponse {
   error: string;
 }
@@ -67,6 +84,7 @@ export default function Cadastro() {
       primeiroNome: "",
       ultimoNome: "",
       setor: "",
+      files: undefined,
     },
   });
 
@@ -75,23 +93,41 @@ export default function Cadastro() {
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setDisabledForm(true);
 
+    // Criação do FormData para envio de arquivos e dados
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("senha", data.senha);
+    formData.append("primeiroNome", data.primeiroNome);
+    formData.append("ultimoNome", data.ultimoNome);
+    formData.append("setor", data.setor || "");
+
+    // Adiciona o arquivo ao FormData, se houver um arquivo selecionado
+    if (data.files) {
+      formData.append("files", data.files[0]); // Apenas o primeiro arquivo (ajuste para múltiplos, se necessário)
+    }
+
     try {
       setErrorMessage(null);
       await axios.post(
         "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod/create",
-        data
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       router.push("/");
+
+      console.log(data);
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ErrorResponse>;
 
-      // Verifica se a resposta contém a propriedade 'error'
       const errorMessage =
         axiosError.response?.data?.error ??
-        "Erro ao realizar login. Tente novamente.";
+        "Erro ao realizar o cadastro. Tente novamente.";
 
-      // Captura o erro e atualiza o estado
       setErrorMessage(errorMessage);
 
       setTimeout(() => {
@@ -119,6 +155,7 @@ export default function Cadastro() {
         )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Campos de texto */}
             <FormField
               control={form.control}
               name="email"
@@ -217,6 +254,29 @@ export default function Cadastro() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="files"
+              render={({ field }) => (
+                <FormItem>
+                  <Label
+                    className="ml-3 text-muted-foreground"
+                    htmlFor="picture"
+                  >
+                    Imagem perfil
+                  </Label>
+                  <FormControl>
+                    <Input
+                      disabled={disabledForm}
+                      type="file"
+                      id="picture"
+                      onChange={(e) => field.onChange(e.target.files)}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-start ml-2" />
+                </FormItem>
+              )}
+            />
             <Button
               disabled={disabledForm}
               type="submit"
@@ -225,7 +285,7 @@ export default function Cadastro() {
               {disabledForm ? (
                 <Icon name="LoaderCircle" className="animate-spin" />
               ) : (
-                "cadastrar"
+                "Cadastrar"
               )}
             </Button>
           </form>
