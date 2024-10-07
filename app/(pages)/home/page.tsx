@@ -102,7 +102,7 @@ export default function Home() {
             value="jogos"
             className="flex px-6 gap-5 flex-col items-center"
           >
-            <Card className="w-full mt-4">
+            <Card className="md:w-1/3 w-full mt-4">
               <CardContent className="flex py-6 justify-between items-center">
                 <div className="w-1/3 rounded-md text-transparent h-16 bg-[url('https://pge-festival.s3.amazonaws.com/dia-do-servidor.jpeg')] bg-cover">
                   *
@@ -125,7 +125,7 @@ export default function Home() {
                 </RadioGroup>
               </CardContent>
             </Card>
-            <Button className="font-semibold capitalize w-2/3" asChild>
+            <Button className="font-semibold capitalize md:w-1/4 w-2/3" asChild>
               <Link href={"/regras"}>começar</Link>
             </Button>
           </TabsContent>

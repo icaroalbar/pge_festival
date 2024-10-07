@@ -48,18 +48,18 @@ const formSchema = z
     setor: z.optional(z.string()),
     files: z
       .any()
-      .refine((file) => file.size <= 10 * 1024 * 1024, {
-        message: "O arquivo deve ter no máximo 10 MB",
-      })
-      .refine(
-        (file) => {
-          const validTypes = ["image/jpeg", "image/png", "image/jpg"];
-          return validTypes.includes(file.type);
-        },
-        {
-          message: "Apenas arquivos de imagem (JPEG, PNG, JPG) são permitidos",
-        }
-      )
+      // .refine((file) => file.size <= 10 * 1024 * 1024, {
+      //   message: "O arquivo deve ter no máximo 10 MB",
+      // })
+      // .refine(
+      //   (file) => {
+      //     const validTypes = ["image/jpeg", "image/png", "image/jpg"];
+      //     return validTypes.includes(file.type);
+      //   },
+      //   {
+      //     message: "Apenas arquivos de imagem (JPEG, PNG, JPG) são permitidos",
+      //   }
+      // )
       .optional(),
   })
 

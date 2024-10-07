@@ -1,7 +1,6 @@
 "use client";
 
 import CardAuth from "@/components/ui/cardAuth";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,6 +18,7 @@ import axios, { AxiosError } from "axios";
 import Icon from "@/components/ui/icons";
 import { useState } from "react";
 import { useUser } from "@/app/hook/UserProvider";
+import { DialogREcuperarSenha } from "@/components/ui/dialog-recuperar-senha";
 
 const formSchema = z.object({
   email: z.string().min(2, { message: "O campo de e-mail é obrigatório." }),
@@ -144,12 +144,7 @@ export default function Login() {
           </form>
         </Form>
         <div>
-          <Link
-            href="/recuperarSenha"
-            className="text-start text-xs my-2 font-medium text-ring underline-offset-4 hover:underline"
-          >
-            Esqueci minha senha
-          </Link>
+          <DialogREcuperarSenha />
         </div>
       </div>
     </CardAuth>

@@ -31,7 +31,7 @@ export default function CardAuth({
 }>) {
   return (
     <Card
-      className={`md:w-3/4 w-full ${
+      className={`md:w-1/3 w-full ${
         title === "Email enviado!" ||
         title === "Parabéns, você finalizou o desafio!"
           ? "text-center"

@@ -32,7 +32,7 @@ export default function Finalizado() {
         <h4 className="text-muted-foreground text-xl">
           Até a próxima aventura!
         </h4>
-        <Button className="font-semibold w-full lg:w-2/4 my-2" asChild>
+        <Button className="font-semibold w-full my-2" asChild>
           <Link href={"/home"}>Página inicial</Link>
         </Button>
       </div>

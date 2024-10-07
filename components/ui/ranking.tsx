@@ -58,7 +58,7 @@ export function Ranking() {
   const { scoreUser, ranking } = data;
 
   return (
-    <div className="h-screen bg-primary py-6">
+    <div className="h-screen flex justify-start gap-y-8 items-center flex-col bg-primary py-6">
       <div className="flex items-center justify-center">
         <Image
           src="https://pge-festival.s3.amazonaws.com/ranking.png"
@@ -68,7 +68,7 @@ export function Ranking() {
           priority
         />
       </div>
-      <div className="flex flex-col gap-3 justify-center items-center p-4">
+      <div className="flex flex-col gap-3 w-full md:w-1/3 justify-center items-center p-4">
         {ranking.map((item: RankingItem, index: number) => (
           <div
             key={index}

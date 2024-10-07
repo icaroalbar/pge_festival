@@ -34,7 +34,7 @@ export default function Perfil() {
           {user?.ultimoNome?.charAt(0)}
         </AvatarFallback>
       </Avatar>
-      <div className="flex flex-col">
+      <div className="flex flex-col w-full">
         <p className="text-end text-sm text-muted-foreground">
           Pontuação: {user?.score}
         </p>
@@ -42,7 +42,7 @@ export default function Perfil() {
           <li>Nome: {`${user?.primeiroNome} ${user?.ultimoNome}`}</li>
           <li>Setor: {user?.setor}</li>
         </ul>
-        <Button className="font-semibold w-full lg:w-2/4 my-2" asChild>
+        <Button className="font-semibold w-full mt-6" asChild>
           <Link href="/editarPerfil">Editar perfil</Link>
         </Button>
       </div>

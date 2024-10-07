@@ -250,10 +250,10 @@ export default function Perguntas() {
           <Icon name="LogOut" />
         </Button>
       </nav>
-      <div className="p-4">
+      <div className="p-4 flex justify-center">
         <CardPergunta
           title={perguntaAtual?.question || "Pergunta não disponível"}
-          className="border border-primary/70 shadow-xl"
+          className="border border-primary/70 shadow-xl max-w-2xl"
         >
           <CardHeader>
             <div className="flex justify-between pb-2 text-primary">
@@ -333,7 +333,7 @@ export default function Perguntas() {
                   updateUserScore(isQuestionNum, timer);
                   router.push("/home");
                 }}
-                className={`bg-muted-foreground hover:bg-muted-foreground/90 font-semibold w-full lg:w-2/4 my-2 ${
+                className={`bg-muted-foreground w-full hover:bg-muted-foreground/90 font-semibold my-2 ${
                   isQuestionNum === 9999 && "hidden"
                 }`}
               >

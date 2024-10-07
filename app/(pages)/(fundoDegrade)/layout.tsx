@@ -16,7 +16,9 @@ export default function RootLayout({
           priority
         />
       </header>
-      <main className="flex-grow w-full">{children}</main>
+      <main className="flex-grow flex w-full items-center justify-center">
+        {children}
+      </main>
       <footer>
         <Image
           src="https://pge-festival.s3.amazonaws.com/logo-pg-inova.png"
