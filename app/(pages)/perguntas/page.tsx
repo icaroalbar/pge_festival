@@ -352,32 +352,30 @@ export default function Perguntas() {
                             <RadioGroup
                               onValueChange={field.onChange}
                               defaultValue={field.value}
-                              className="grid grid-cols-2 gap-3"
                             >
                               {respostasAtuais?.map((resposta, index) => (
-                                <FormItem
-                                  key={index}
-                                  className={cn(
-                                    "flex items-center text-primary border space-x-3 space-y-0 p-4",
-                                    resposta.description ===
-                                      form.getValues("type")
-                                      ? "border-primary bg-primary/10"
-                                      : "border-muted-foreground"
-                                  )}
-                                >
+                                <FormItem key={index}>
                                   <FormControl>
-                                    <RadioGroupItem
-                                      value={resposta.description}
-                                      id={`option-${index}`}
-                                      className="sr-only"
-                                    />
+                                    <div className="flex items-center space-x-2">
+                                      <RadioGroupItem
+                                        value={resposta.description}
+                                        id={`option-${index}`}
+                                        className="sr-only"
+                                      />
+                                      <FormLabel
+                                        htmlFor={`option-${index}`}
+                                        className={cn(
+                                          "flex w-full items-center p-4 rounded-md text-primary border space-x-3 space-y-0",
+                                          resposta.description ===
+                                            form.getValues("type")
+                                            ? "border-primary text-white bg-primary/80"
+                                            : "border-muted-foreground"
+                                        )}
+                                      >
+                                        {resposta.description}
+                                      </FormLabel>
+                                    </div>
                                   </FormControl>
-                                  <FormLabel
-                                    htmlFor={`option-${index}`}
-                                    className="cursor-pointer"
-                                  >
-                                    {resposta.description}
-                                  </FormLabel>
                                 </FormItem>
                               ))}
                             </RadioGroup>
