@@ -22,11 +22,15 @@ import axios from "axios";
 import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Icon from "@/components/ui/icons";
 import { useUser } from "@/app/hook/UserProvider";
+import { PaginaCarregamento } from "@/components/ui/paginaCarregamento";
+import { Input } from "@/components/ui/input";
+import { uploadFile } from "./uploadFile";
 
 interface Pergunta {
   questionNum: number;
   question: string;
   correctAnswer: number;
+  tipoPergunta: "M" | "Q" | "I";
 }
 
 interface Resposta {
@@ -36,7 +40,8 @@ interface Resposta {
 }
 
 const FormSchema = z.object({
-  type: z.string().min(1),
+  type: z.string().min(1).optional(),
+  files: z.any().optional(),
 });
 
 const url = "https://5quazgdoai.execute-api.us-east-1.amazonaws.com/prod";
@@ -56,6 +61,7 @@ const fetchData = async () => {
 export default function Perguntas() {
   const { user, setUser } = useUser();
   const [isChecking, setIsChecking] = useState<boolean>(true);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isQuestionNum, setIsQuestionNum] = useState<number>(
     user?.lastQuestion || 1
   );
@@ -128,13 +134,19 @@ export default function Perguntas() {
     setTimer(timer);
 
     const countdown = setInterval(() => {
+      const perguntaAtual = data?.perguntas.find(
+        (item: Pergunta) => item.questionNum === isQuestionNum
+      );
+
+      // Se o tipo da pergunta for "I", não inicie o temporizador
+      if (perguntaAtual?.tipoPergunta === "I") {
+        clearInterval(countdown); // Para o temporizador se for "I"
+        return; // Não faz mais nada
+      }
+
       setTimer((prev) => {
         if (prev <= 1) {
           clearInterval(countdown); // Limpa o intervalo quando o tempo acaba
-
-          const perguntaAtual = data?.perguntas.find(
-            (item: Pergunta) => item.questionNum === isQuestionNum
-          );
 
           const respostasAtuais = data?.respostas.filter(
             (resposta: Resposta) => resposta.questionNum === isQuestionNum
@@ -192,7 +204,7 @@ export default function Perguntas() {
   }
 
   if (!data) {
-    return <p>Carregando...</p>;
+    return <PaginaCarregamento />;
   }
 
   const perguntaAtual = data.perguntas.find(
@@ -203,24 +215,45 @@ export default function Perguntas() {
     (resposta: Resposta) => resposta.questionNum === isQuestionNum
   );
 
-  async function onSubmit() {
-    const selectedAnswer = form.getValues("type");
-    const selectedResposta = respostasAtuais.find(
-      (resposta) => resposta.description === selectedAnswer
-    );
+  async function onSubmit(image) {
+    // Verifica se a pergunta atual requer um arquivo
+    if (perguntaAtual?.tipoPergunta === "I") {
+      const file = image?.files ? image.files[0] : null; // Verifica se image e files existem
 
-    if (selectedResposta?.optionNum === perguntaAtual?.correctAnswer) {
-      setIsScoreUser((prev) => prev + 100);
+      if (file) {
+        setIsDisabled(true);
+        try {
+          await uploadFile(file, user?.id, isQuestionNum); // Chama a função de upload do arquivo
+          setIsScoreUser((prev) => prev + 150); // Adiciona 200 pontos ao usuário
+        } catch (error) {
+          console.error("Erro ao enviar o arquivo:", error);
+          // Aqui você pode adicionar uma mensagem de erro para o usuário, se necessário
+        } finally {
+          setIsDisabled(false);
+        }
+      }
     }
 
+    // Verifica se o tipo de pergunta é diferente de "I" ou se não houve arquivo
+    else {
+      // Se a pergunta não requer um arquivo, ou não houve upload, verifica a resposta selecionada
+      const selectedAnswer = form.getValues("type");
+      const selectedResposta = respostasAtuais.find(
+        (resposta) => resposta.description === selectedAnswer
+      );
+
+      if (selectedResposta?.optionNum === perguntaAtual?.correctAnswer) {
+        setIsScoreUser((prev) => prev + 100); // Adiciona 100 pontos pela resposta correta
+      }
+    }
+
+    // Avança para a próxima pergunta, se houver mais
     if (isQuestionNum < data!.perguntas.length) {
       setIsQuestionNum((prev) => prev + 1);
     }
-    setTimer(30);
-  }
 
-  if (!perguntaAtual) {
-    router.push("/finalizado");
+    // Reinicia o temporizador
+    setTimer(30);
   }
 
   return (
@@ -256,8 +289,18 @@ export default function Perguntas() {
           className="border border-primary/70 shadow-xl max-w-2xl"
         >
           <CardHeader>
-            <div className="flex justify-between pb-2 text-primary">
-              <div className="flex items-center gap-x-2">
+            <div
+              className={`flex pb-2 text-primary ${
+                perguntaAtual?.tipoPergunta === "I"
+                  ? "justify-end"
+                  : "justify-between"
+              }`}
+            >
+              <div
+                className={`items-center gap-x-2 ${
+                  perguntaAtual?.tipoPergunta === "I" ? "hidden" : "flex"
+                }`}
+              >
                 <Icon name="Clock" />
                 {timer} segundos
               </div>
@@ -277,48 +320,74 @@ export default function Perguntas() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="space-y-6"
                 >
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex flex-col space-y-1"
-                          >
-                            {respostasAtuais.map((resposta, index) => (
-                              <FormItem
-                                key={index}
-                                className={cn(
-                                  "flex items-center text-primary border space-x-3 space-y-0 p-4 rounded-md cursor-pointer transition-colors",
-                                  field.value === resposta.description
-                                    ? "border-primary border-2"
-                                    : "border-primary/40"
-                                )}
-                                onClick={() =>
-                                  field.onChange(resposta.description)
-                                }
-                              >
-                                <FormControl>
-                                  <RadioGroupItem
-                                    value={resposta.description}
-                                    className="hidden"
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">
-                                  {resposta.description}
-                                </FormLabel>
-                              </FormItem>
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {perguntaAtual?.tipoPergunta === "I" ? (
+                    // Pergunta de tipo 'I' requer um arquivo para upload
+                    <FormField
+                      control={form.control}
+                      name="files"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Envie sua imagem aqui</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={isDisabled}
+                              type="file"
+                              accept="image/*"
+                              placeholder="Envie uma imagem"
+                              onChange={(e) => field.onChange(e.target.files)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    // Caso contrário, exibe as opções de resposta múltipla
+                    <FormField
+                      control={form.control}
+                      name="type"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="grid grid-cols-2 gap-3"
+                            >
+                              {respostasAtuais?.map((resposta, index) => (
+                                <FormItem
+                                  key={index}
+                                  className={cn(
+                                    "flex items-center text-primary border space-x-3 space-y-0 p-4",
+                                    resposta.description ===
+                                      form.getValues("type")
+                                      ? "border-primary bg-primary/10"
+                                      : "border-muted-foreground"
+                                  )}
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      value={resposta.description}
+                                      id={`option-${index}`}
+                                      className="sr-only"
+                                    />
+                                  </FormControl>
+                                  <FormLabel
+                                    htmlFor={`option-${index}`}
+                                    className="cursor-pointer"
+                                  >
+                                    {resposta.description}
+                                  </FormLabel>
+                                </FormItem>
+                              ))}
+                            </RadioGroup>
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  )}
                   <Button
+                    disabled={isDisabled}
                     className={`font-semibold w-full ${
                       isQuestionNum === 9999 && "hidden"
                     }`}
@@ -329,6 +398,7 @@ export default function Perguntas() {
                 </form>
               </Form>
               <Button
+                disabled={isDisabled}
                 onClick={() => {
                   updateUserScore(isQuestionNum, timer);
                   router.push("/home");

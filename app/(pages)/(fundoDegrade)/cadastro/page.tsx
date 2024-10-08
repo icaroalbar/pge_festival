@@ -270,6 +270,7 @@ export default function Cadastro() {
                       disabled={disabledForm}
                       type="file"
                       id="picture"
+                      accept="image/*"
                       onChange={(e) => field.onChange(e.target.files)}
                     />
                   </FormControl>

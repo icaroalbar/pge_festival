@@ -44,7 +44,7 @@ export default function CardAuth({
         </CardTitle>
         <CardDescription className="text-muted-foreground space-x-1">
           <span>{description}</span>
-          <span className="font-bold">{email}</span>.
+          <span className="font-bold">{email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>{children}</CardContent>
