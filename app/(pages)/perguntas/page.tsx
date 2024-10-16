@@ -41,6 +41,7 @@ interface Resposta {
 
 const FormSchema = z.object({
   type: z.string().min(1).optional(),
+  textResponse: z.string().min(1).optional(),
   files: z.any().optional(),
 });
 
@@ -139,7 +140,10 @@ export default function Perguntas() {
       );
 
       // Se o tipo da pergunta for "I", não inicie o temporizador
-      if (perguntaAtual?.tipoPergunta === "I") {
+      if (
+        perguntaAtual?.tipoPergunta === "I" ||
+        perguntaAtual?.tipoPergunta === "Q"
+      ) {
         clearInterval(countdown); // Para o temporizador se for "I"
         return; // Não faz mais nada
       }
@@ -224,18 +228,27 @@ export default function Perguntas() {
         setIsDisabled(true);
         try {
           await uploadFile(file, user?.id, isQuestionNum); // Chama a função de upload do arquivo
-          setIsScoreUser((prev) => prev + 150); // Adiciona 200 pontos ao usuário
+          setIsScoreUser((prev) => prev + 150); // Adiciona 150 pontos ao usuário
         } catch (error) {
           console.error("Erro ao enviar o arquivo:", error);
-          // Aqui você pode adicionar uma mensagem de erro para o usuário, se necessário
         } finally {
           setIsDisabled(false);
         }
       }
-    }
+    } else if (perguntaAtual?.tipoPergunta === "Q") {
+      // Pergunta do tipo 'Q', compara a resposta digitada com a descrição
+      const userResponse = form.getValues("textResponse");
+      const respostaAtual = respostasAtuais[0]; // Como você mencionou, haverá apenas uma resposta
 
-    // Verifica se o tipo de pergunta é diferente de "I" ou se não houve arquivo
-    else {
+      // Compara a resposta digitada com a descrição da resposta atual
+      if (
+        respostaAtual &&
+        userResponse?.trim().toLowerCase() ===
+          respostaAtual.description.trim().toLowerCase()
+      ) {
+        setIsScoreUser((prev) => prev + 200); // Adiciona 150 pontos pela resposta correta
+      }
+    } else {
       // Se a pergunta não requer um arquivo, ou não houve upload, verifica a resposta selecionada
       const selectedAnswer = form.getValues("type");
       const selectedResposta = respostasAtuais.find(
@@ -291,14 +304,18 @@ export default function Perguntas() {
           <CardHeader>
             <div
               className={`flex pb-2 text-primary ${
-                perguntaAtual?.tipoPergunta === "I"
+                perguntaAtual?.tipoPergunta === "I" ||
+                perguntaAtual?.tipoPergunta === "Q"
                   ? "justify-end"
                   : "justify-between"
               }`}
             >
               <div
                 className={`items-center gap-x-2 ${
-                  perguntaAtual?.tipoPergunta === "I" ? "hidden" : "flex"
+                  perguntaAtual?.tipoPergunta === "I" ||
+                  perguntaAtual?.tipoPergunta === "Q"
+                    ? "hidden"
+                    : "flex"
                 }`}
               >
                 <Icon name="Clock" />
@@ -335,6 +352,25 @@ export default function Perguntas() {
                               accept="image/*"
                               placeholder="Envie uma imagem"
                               onChange={(e) => field.onChange(e.target.files)}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : perguntaAtual?.tipoPergunta === "Q" ? (
+                    // Pergunta de tipo 'Q' requer um campo de texto para resposta
+                    <FormField
+                      control={form.control}
+                      name="textResponse"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Digite sua resposta aqui</FormLabel>
+                          <FormControl>
+                            <Input
+                              disabled={isDisabled}
+                              placeholder="Digite sua resposta"
+                              onChange={field.onChange}
                             />
                           </FormControl>
                           <FormMessage />
@@ -395,6 +431,7 @@ export default function Perguntas() {
                   </Button>
                 </form>
               </Form>
+
               <Button
                 disabled={isDisabled}
                 onClick={() => {
