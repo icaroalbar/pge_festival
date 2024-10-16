@@ -300,7 +300,7 @@ export default function Cadastro() {
                     <FormDescription>
                       Concordo em compartilhar minhas informações pessoais,
                       assim como fotos, videos e outras mídias para participar
-                      do jogo.
+                      do game.
                     </FormDescription>
                   </div>
                 </FormItem>
