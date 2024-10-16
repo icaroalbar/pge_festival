@@ -6,6 +6,7 @@ import { z } from "zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormMessage,
@@ -18,6 +19,7 @@ import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import Icon from "@/components/ui/icons";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z
   .object({
@@ -61,6 +63,8 @@ const formSchema = z
       //   }
       // )
       .optional(),
+
+    confirmacao: z.boolean().default(false),
   })
 
   .refine((data) => data.senha === data.confirmarSenha, {
@@ -85,10 +89,12 @@ export default function Cadastro() {
       ultimoNome: "",
       setor: "",
       files: undefined,
+      confirmacao: false,
     },
   });
 
   const router = useRouter();
+  const isConfirmed = form.watch("confirmacao");
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     setDisabledForm(true);
@@ -278,8 +284,30 @@ export default function Cadastro() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="confirmacao"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={disabledForm}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormDescription>
+                      Concordo em compartilhar minhas informações pessoais,
+                      assim como fotos, videos e outras mídias para participar
+                      do jogo.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
             <Button
-              disabled={disabledForm}
+              disabled={disabledForm || !isConfirmed}
               type="submit"
               className="w-full capitalize font-semibold"
             >
