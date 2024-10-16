@@ -21,7 +21,7 @@ export function DialogREcuperarSenha() {
           Esqueci minha senha
         </Button>
       </DialogTrigger>
-      <DialogContent className=" mx-4">
+      <DialogContent className="rounded-lg w-11/12">
         <DialogHeader>
           <DialogTitle className="font-semibold text-2xl text-primary">
             Xiii... Esqueceu sua senha?
