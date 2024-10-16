@@ -3,4 +3,5 @@ export const listaRegras = [
   "Não é permitido consultar o navegador",
   "As tarefas de 'quiz' possuem tempo de 30 segundos para resposta",
   "Nas tarefas de foto ou qr code é possível pausar sem prejuízos à pontuação",
+  "A pontuação difere de acordo com a dificuldade da tarefa",
 ];
