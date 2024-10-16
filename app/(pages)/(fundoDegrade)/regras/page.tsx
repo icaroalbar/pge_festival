@@ -64,7 +64,7 @@ export default function Regras() {
   }
 
   return (
-    <Card className="md:w-3/4 w-full">
+    <Card className="md:w-2/4 w-full">
       <CardHeader>
         <CardTitle className="uppercase text-primary underline underline-offset-2 text-center">
           regras do jogo
@@ -77,6 +77,11 @@ export default function Regras() {
               <p className="text-justify">{regra}</p>
             </li>
           ))}
+          <ul>
+            <li>a. Pergunta: 100 pontos;</li>
+            <li>b. Tarefa: 150 pontos;</li>
+            <li>c. Senha: 200 pontos.</li>
+          </ul>
         </ol>
       </CardContent>
       <CardFooter className="flex flex-col gap-y-5">
