@@ -13,14 +13,21 @@ const QRCodeComponent = () => {
     const fetchCamerasAndStartScanner = async () => {
       const cameras = await Html5Qrcode.getCameras(); // Obtém a lista de câmeras disponíveis
       if (cameras && cameras.length > 0) {
+        // Tenta encontrar a câmera traseira (geralmente contém 'back' ou 'rear' no label)
+        const backCamera = cameras.find((camera) =>
+          camera.label.toLowerCase().includes("back")
+        );
+
+        // Se encontrar a câmera traseira, usa ela; caso contrário, usa a primeira disponível
+        const cameraId = backCamera ? backCamera.id : cameras[0].id;
+
         if (!scannerRef.current) {
-          // Cria a instância do scanner apenas se não existir
           const html5QrCode = new Html5Qrcode("reader");
 
-          // Inicia o scanner na primeira câmera disponível
+          // Inicia o scanner com a câmera selecionada
           html5QrCode
             .start(
-              cameras[0].id,
+              cameraId,
               {
                 fps: 10, // Frames por segundo
                 qrbox: { width: 250, height: 250 }, // Tamanho da área de escaneamento
