@@ -5,7 +5,4 @@ export const listaRegras = [
   "Os enunciados do tipo “pergunta” possuem tempo de 30 segundos para resposta.",
   "Nos enunciados do tipo tarefa e senha, é possível pausar o tempo sem prejuízos à pontuação.",
   "A pontuação difere com o tipo de enunciado:",
-  //  a.	Pergunta: 100 pontos
-  //  b.	Tarefa: 150 pontos
-  //  c.	Senha: 200 pontos",
 ];

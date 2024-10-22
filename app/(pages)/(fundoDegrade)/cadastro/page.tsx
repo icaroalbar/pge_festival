@@ -125,8 +125,6 @@ export default function Cadastro() {
       );
 
       router.push("/");
-
-      console.log(data);
     } catch (error: unknown) {
       const axiosError = error as AxiosError<ErrorResponse>;
 

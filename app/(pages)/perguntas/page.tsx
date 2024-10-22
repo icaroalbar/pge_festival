@@ -260,6 +260,9 @@ export default function Perguntas() {
       }
     }
 
+    // Chame o updateUserScore antes de avançar para a próxima pergunta
+    await updateUserScore(isQuestionNum, timer); // Salva o progresso com os valores atuais de isQuestionNum e timer
+
     // Avança para a próxima pergunta, se houver mais
     if (isQuestionNum < data!.perguntas.length) {
       setIsQuestionNum((prev) => prev + 1);
