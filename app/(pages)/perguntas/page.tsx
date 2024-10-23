@@ -59,15 +59,28 @@ const fetchData = async () => {
   };
 };
 
+const fetchUser = async (userId: number) => {
+  const response = await axios.get(`${url}/user/${userId}`);
+  return response.data[0];
+};
+
 export default function Perguntas() {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
+
+  const { data: dataUserDb, error: userError } = useSWR(
+    user?.id ? `${url}/user/${user.id}` : null,
+    () => (user?.id ? fetchUser(user.id) : null)
+  );
+
   const [isChecking, setIsChecking] = useState<boolean>(true);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isQuestionNum, setIsQuestionNum] = useState<number>(
-    user?.lastQuestion || 1
+    dataUserDb?.lastQuestion || null
   );
-  const [timer, setTimer] = useState<number>(user?.timer || 30);
-  const [isScoreUser, setIsScoreUser] = useState<number>(user?.score || 0);
+  const [timer, setTimer] = useState<number>(dataUserDb?.timer || null);
+  const [isScoreUser, setIsScoreUser] = useState<number>(
+    dataUserDb?.score || null
+  );
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
@@ -76,7 +89,15 @@ export default function Perguntas() {
 
   const { data, error } = useSWR(url, fetchData);
 
-  // Função para atualizar a pontuação do usuário
+  useEffect(() => {
+    if (dataUserDb) {
+      setIsQuestionNum(dataUserDb.lastQuestion);
+      setTimer(dataUserDb.timer);
+      setIsScoreUser(dataUserDb.score);
+      setIsChecking(false);
+    }
+  }, [dataUserDb]);
+
   const updateUserScore = useCallback(
     async (lastQuestion: number, timeLeft: number) => {
       if (!user) return; // Retorne se user não estiver definido
@@ -90,17 +111,18 @@ export default function Perguntas() {
         });
 
         // Atualize o contexto do usuário com os novos dados
-        setUser((prevUser) => ({
-          ...prevUser, // Mantém os campos anteriores
-          score: isScoreUser, // Atualiza a pontuação
-          lastQuestion: lastQuestion,
-          timer: timeLeft,
-        }));
+        // setUser((prevUser) => ({
+        //   ...prevUser, // Mantém os campos anteriores
+        //   score: isScoreUser, // Atualiza a pontuação
+        //   lastQuestion: lastQuestion,
+        //   timer: timeLeft,
+        // }));
       } catch (error) {
         console.error("Erro ao atualizar a pontuação do usuário:", error);
       }
     },
-    [user, isScoreUser, setUser]
+    // [user, isScoreUser, setUser]
+    [user, isScoreUser]
   );
 
   useEffect(() => {
@@ -127,7 +149,7 @@ export default function Perguntas() {
     const dataUser = localStorage.getItem("dataUser");
 
     if (!dataUser) {
-      router.push("/");
+      router.replace("/");
       return; // Evitar execução desnecessária
     }
 
@@ -187,12 +209,12 @@ export default function Perguntas() {
       // Verifica se todas as perguntas foram respondidas
       if (data?.perguntas && isQuestionNum > data.perguntas.length - 1) {
         await updateUserScore(9999, timer);
-        router.push("/finalizado");
+        router.replace("/finalizado");
       }
 
       // Verifica se a última pergunta foi alcançada
       if (user?.lastQuestion === 9999) {
-        router.push("/finalizado");
+        router.replace("/finalizado");
       }
     };
 
@@ -203,11 +225,11 @@ export default function Perguntas() {
     return null;
   }
 
-  if (error) {
+  if (error || userError) {
     return <p>Houve um erro ao carregar a pergunta: {error.message}</p>;
   }
 
-  if (!data) {
+  if (!data || !dataUserDb) {
     return <PaginaCarregamento />;
   }
 
@@ -262,7 +284,6 @@ export default function Perguntas() {
 
     // Chame o updateUserScore antes de avançar para a próxima pergunta
     await updateUserScore(isQuestionNum, timer); // Salva o progresso com os valores atuais de isQuestionNum e timer
-
     // Avança para a próxima pergunta, se houver mais
     if (isQuestionNum < data!.perguntas.length) {
       setIsQuestionNum((prev) => prev + 1);
